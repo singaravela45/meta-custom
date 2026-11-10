@@ -1,41 +1,73 @@
-This README file contains information on the contents of the meta-custom layer.
+A custom Yocto layer for integrating the Smart Attendance / Face Recognition Application into a Raspberry Pi embedded Linux image.
 
-Please see the corresponding sections below for details.
+This layer contains the application files, BitBake recipes, and package configuration used by the project. The application recognises registered faces for attendance logging and retains the security feature of notifying the user when an unknown or unauthorised person is detected.
 
+Repository: https://github.com/singaravela45/meta-custom
+Features
+- Packages the Python application (main.py) into the target root filesystem.
+- Installs the known_faces directory used by the face-recognition application.
+- Provides a packagegroup to collect the application's runtime packages.
+- Provides a custom image recipe (custom-image.bb) for the Raspberry Pi build.
+- Supports the project's hybrid dependency approach: dlib is integrated through a third-party Yocto layer, while face_recognition_models is installed on the Raspberry Pi after boot.
+Layer contents
+The layer is organised around these components:
+Component	Purpose
+conf/layer.conf	Registers the layer and its recipe search paths with BitBake.
+recipes-core/images/custom-image.bb	Defines the custom image and includes the project packagegroup.
+allfiles.bb	Installs main.py and known_faces into /home/root/files on the target.
+packagegroup.bb	Groups the Python, OpenCV, camera, GPIO, and supporting runtime packages.
+files/	Holds the application source and face data referenced by the recipes.
+
+
+The exact recipe and file locations should match the checked-in repository layout.
 Dependencies
-============
+The build environment needs the Yocto layers used by the project:
+- Poky — the Yocto reference distribution and OpenEmbedded build system.
+- meta-openembedded — additional OpenEmbedded recipes used by the build.
+- meta-raspberrypi — Raspberry Pi machine support.
+- meta-iris-thirdparty — used in this project to obtain the dlib recipe.
+Use branches that are compatible with the same Yocto release. The exact branch names depend on the release selected for the build environment.
+Adding this layer to a build
+Clone the layer into a location alongside your other Yocto layers:
+git clone https://github.com/singaravela45/meta-custom.git
+From the Yocto build directory, add the layer:
+bitbake-layers add-layer ../meta-custom
+Check that BitBake recognises it:
+bitbake-layers show-layers
+If your layer is stored in a different location, adjust the path passed to add-layer.
+Building the image
+Build the custom image recipe:
+bitbake custom-image
+BitBake will resolve the image's package dependencies and build the image and required packages. Review the build output for errors before deploying the generated image to the Raspberry Pi.
+Application installation
+The allfiles application recipe installs the application files under:
+/home/root/files/
+├── main.py
+└── known_faces/
+The recipe declares Python, NumPy, and OpenCV as runtime dependencies.
 
-  URI: <first dependency>
-  branch: <branch name>
+The packagegroup collects the project's runtime packages, including Python 3, pip, NumPy, OpenCV, Pillow, camera utilities, GPIO support, and supporting libraries. The packagegroup also depends on the allfiles application package so that the application is included when the packagegroup is installed.
+Machine-learning dependency note
+The project uses face_recognition, which relies on dlib and the face_recognition_models package.
 
-  URI: <second dependency>
-  branch: <branch name>
+In the current project setup:
+- dlib is included in the Yocto build using the recipe available through meta-iris-thirdparty.
+- face_recognition_models is installed natively on the Raspberry Pi after boot because a suitable Yocto recipe was not available in the project environment.
+- The reported on-target installation time for the model package was approximately 30 minutes.
+This is a hybrid deployment arrangement; it does not mean that every face-recognition dependency is built into the Yocto image.
+Target-device verification
+After flashing and booting the generated image on the Raspberry Pi, verify that:
+1. The application files exist under /home/root/files.
+2. The known_faces directory contains the expected registered-face data.
+3. The required Python packages and camera dependencies are available.
+4. The remaining face_recognition_models dependency has been installed if it is not included in the image.
+5. The application can access the camera, recognise registered faces, log attendance, and trigger the configured email notification for unknown faces.
+Notes
+- Ensure that the machine configuration and all layer branches are compatible with the selected Yocto release.
+- The package names in the packagegroup must be available from the enabled layers for the selected machine and release.
+- The root filesystem destination uses ${ROOT_HOME} in the application recipe. Ensure that this variable is defined and resolves to /home/root in the build configuration.
+- Do not store real attendance records, personal face images, credentials, or email passwords in a public repository. Keep sensitive data and configuration out of version control.
+Maintainer
+Singaravela R
 
-  .
-  .
-  .
-
-Patches
-=======
-
-Please submit any patches against the meta-custom layer to the xxxx mailing list (xxxx@zzzz.org)
-and cc: the maintainer:
-
-Maintainer: Singara vela <singaravelaramesh@gmail.com>
-
-Table of Contents
-=================
-
-  I. Adding the meta-custom layer to your build
- II. Misc
-
-
-I. Adding the meta-custom layer to your build
-=================================================
-
-Run 'bitbake-layers add-layer meta-custom'
-
-II. Misc
-========
-
---- replace with specific information about the meta-custom layer ---
+For issues or improvements, open an issue or submit a pull request in the repository.
