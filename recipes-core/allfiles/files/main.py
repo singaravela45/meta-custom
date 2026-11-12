@@ -20,7 +20,7 @@ from email.mime.image import MIMEImage
 # ==========================================
 
 SENDER_EMAIL = "hitmanfanvela@gmail.com"
-SENDER_PASSWORD = "qddf nhbx ttfb rmxn"
+SENDER_PASSWORD = "xxxxx"
 RECEIVER_EMAIL = "singaravelaramesh@gmail.com"
 
 SMTP_SERVER = "smtp.gmail.com"
