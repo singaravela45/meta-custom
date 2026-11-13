@@ -1,5 +1,6 @@
 SUMMARY = "A small image just capable of allowing a device to boot."
-LICENSE = "CLOSED"
+LICENSE = "MIT"
+
 IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL}"
 IMAGE_INSTALL:append = " \
     packagegroup \
@@ -7,7 +8,6 @@ IMAGE_INSTALL:append = " \
 IMAGE_FEATURES += "debug-tweaks"
 IMAGE_LINGUAS = " "
 
-LICENSE = "MIT"
 
 inherit core-image
 IMAGE_OVERHEAD_FACTOR ?= "1.3"
