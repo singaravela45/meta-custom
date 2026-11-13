@@ -16,7 +16,6 @@ RDEPENDS:${PN} = " \
     usbutils \
     curl \
     nano \
-    rpi-gpio \
     cmake \
     pkgconfig \
     mesa \
@@ -24,3 +23,4 @@ RDEPENDS:${PN} = " \
     glib-2.0 \
     allfiles \
 "
+RDEPENDS:${PN}:append:rpi = " rpi-gpio"
