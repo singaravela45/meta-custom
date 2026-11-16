@@ -1,29 +1,42 @@
-SUMMARY = "Face Recognition Application"
+SUMMARY = "Face Recognition Application Files"
 LICENSE = "CLOSED"
 
 SRC_URI = " \
     file://main.py \
-    file://known_faces \
+    file://.env \
+    file://known_faces/ \
+    file://models/ \
 "
 
 S = "${WORKDIR}"
 
+APP_DIR = "/home/root/files"
+
 do_install() {
-    # Create the target directories inside /home/root/files
-    install -d ${D}${ROOT_HOME}/files/known_faces
 
-    # Install the main Python script into the files directory
-    install -m 0755 ${WORKDIR}/main.py ${D}${ROOT_HOME}/files/main.py
+    install -d ${D}${APP_DIR}
 
-    # Copy the known_faces data into the files directory
-    cp -r ${WORKDIR}/known_faces/* ${D}${ROOT_HOME}/files/known_faces/
+    # Main application
+    install -m 0755 \
+        ${WORKDIR}/main.py \
+        ${D}${APP_DIR}/main.py
+
+    # Environment file
+    install -m 0600 \
+        ${WORKDIR}/.env \
+        ${D}${APP_DIR}/.env
+
+    # Known faces
+    install -d ${D}${APP_DIR}/known_faces
+
+    cp -r ${WORKDIR}/known_faces/. \
+        ${D}${APP_DIR}/known_faces/
+
+    # Haar Cascade model
+    install -d ${D}${APP_DIR}/models
+
+    cp -r ${WORKDIR}/models/. \
+        ${D}${APP_DIR}/models/
 }
 
-# Tell Yocto to package the entire /home/root/files directory
-FILES:${PN} += "${ROOT_HOME}/files"
-
-RDEPENDS:${PN} += " \
-    python3 \
-    python3-numpy \
-    python3-opencv \
-"
+FILES:${PN} += "${APP_DIR}"
