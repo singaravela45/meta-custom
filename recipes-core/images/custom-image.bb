@@ -1,16 +1,13 @@
 SUMMARY = "A custom image for the face-recognition application"
-LICENSE = "MIT"
+LICENSE = "CLOSED"
 
 IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL}"
-IMAGE_INSTALL:append = " \
-    packagegroup \
-"
+IMAGE_INSTALL:append = " packagegroup-custom"
 IMAGE_FEATURES += " \
     ssh-server-openssh \
     debug-tweaks \
 "
 IMAGE_LINGUAS = " "
-
 
 inherit core-image
 IMAGE_OVERHEAD_FACTOR ?= "1.3"
