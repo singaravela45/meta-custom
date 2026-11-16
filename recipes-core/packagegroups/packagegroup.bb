@@ -1,26 +1,21 @@
-SUMMARY = "My Project Package Group"
+SUMMARY = "Custom Package Group"
 LICENSE = "MIT"
 
-PACKAGE_ARCH = "${TUNE_PKGARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
 RDEPENDS:${PN} = " \
-    python3 \
-    python3-pip \
+    allfiles \
+    python3-core \
     python3-numpy \
     python3-opencv \
-    python3-pillow \
-    opencv \
+    python3-datetime \
+    python3-email \
+    python3-netclient \
+    ca-certificates \
     v4l-utils \
     usbutils \
-    curl \
     nano \
-    cmake \
-    pkgconfig \
-    mesa \
-    libx11 \
-    glib-2.0 \
-    allfiles \
+    kernel-module-uvcvideo \
 "
-RDEPENDS:${PN}:append:rpi = " rpi-gpio"
