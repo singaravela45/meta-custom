@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 RDEPENDS:${PN} = " \
-    allfiles \
+    smart-attendance-files \
     python3-core \
     python3-numpy \
     python3-opencv \
