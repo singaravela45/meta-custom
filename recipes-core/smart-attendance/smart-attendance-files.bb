@@ -1,3 +1,4 @@
+
 SUMMARY = "Face Recognition Application Files"
 LICENSE = "CLOSED"
 
@@ -6,11 +7,18 @@ SRC_URI = " \
     file://.env \
     file://known_faces/ \
     file://models/ \
+    file://face-attendance.service \
 "
 
 S = "${WORKDIR}"
 
 APP_DIR = "/home/root/files"
+
+# Enable systemd integration
+inherit systemd
+
+SYSTEMD_SERVICE:${PN} = "face-attendance.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 do_install() {
 
@@ -37,6 +45,16 @@ do_install() {
 
     cp -r ${WORKDIR}/models/. \
         ${D}${APP_DIR}/models/
+
+    # Install systemd service
+    install -d ${D}${systemd_system_unitdir}
+
+    install -m 0644 \
+        ${WORKDIR}/face-attendance.service \
+        ${D}${systemd_system_unitdir}/face-attendance.service
 }
 
-FILES:${PN} += "${APP_DIR}"
+FILES:${PN} += " \
+    ${APP_DIR} \
+    ${systemd_system_unitdir}/face-attendance.service \
+"
