@@ -6,11 +6,16 @@ SRC_URI = " \
     file://.env \
     file://known_faces/ \
     file://models/ \
+    file://face-attendance.service \
 "
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 APP_DIR = "/home/root/files"
+inherit systemd
+
+SYSTEMD_SERVICE:${PN} = "face-attendance.service"
+SYSTEMD_AUTO_ENABLE = "enable"
 
 do_install() {
 
@@ -18,25 +23,29 @@ do_install() {
 
     # Main application
     install -m 0755 \
-        ${WORKDIR}/main.py \
+        ${UNPACKDIR}/main.py \
         ${D}${APP_DIR}/main.py
 
     # Environment file
     install -m 0600 \
-        ${WORKDIR}/.env \
+        ${UNPACKDIR}/.env \
         ${D}${APP_DIR}/.env
 
     # Known faces
     install -d ${D}${APP_DIR}/known_faces
 
-    cp -r ${WORKDIR}/known_faces/. \
+    cp -r ${UNPACKDIR}/known_faces/. \
         ${D}${APP_DIR}/known_faces/
 
     # Haar Cascade model
     install -d ${D}${APP_DIR}/models
 
-    cp -r ${WORKDIR}/models/. \
+    cp -r ${UNPACKDIR}/models/. \
         ${D}${APP_DIR}/models/
+
+    #enable systemd
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${S}/face-attendance.service ${D}${systemd_system_unitdir}/
 }
 
 FILES:${PN} += "${APP_DIR}"
