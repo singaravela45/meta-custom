@@ -1,4 +1,3 @@
-
 SUMMARY = "Face Recognition Application Files"
 LICENSE = "CLOSED"
 
