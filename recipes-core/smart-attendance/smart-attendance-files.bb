@@ -1,59 +1,39 @@
 SUMMARY = "Face Recognition Application Files"
 LICENSE = "CLOSED"
 
-SRC_URI = " \
-    file://main.py \
-    file://.env \
-    file://known_faces/ \
-    file://models/ \
-    file://face-attendance.service \
-"
-
-S = "${WORKDIR}"
-
+SRC_URI = "git://github.com/singaravela45/smart-attendance.git;protocol=https;branch=main;"
+SRC_URI:append = " file://.env"
+SRCREV = "${AUTOREV}"
+S = "${WORKDIR}/git"
 APP_DIR = "/home/root/files"
-
-# Enable systemd integration
 inherit systemd
 
 SYSTEMD_SERVICE:${PN} = "face-attendance.service"
-SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+SYSTEMD_AUTO_ENABLE = "enable"
 
 do_install() {
 
     install -d ${D}${APP_DIR}
 
     # Main application
-    install -m 0755 \
-        ${WORKDIR}/main.py \
-        ${D}${APP_DIR}/main.py
-
-    # Environment file
-    install -m 0600 \
-        ${WORKDIR}/.env \
-        ${D}${APP_DIR}/.env
+    install -m 0755 ${S}/main.py ${D}${APP_DIR}/main.py
 
     # Known faces
     install -d ${D}${APP_DIR}/known_faces
 
-    cp -r ${WORKDIR}/known_faces/. \
-        ${D}${APP_DIR}/known_faces/
+    cp -r ${S}/known_faces/. ${D}${APP_DIR}/known_faces/
 
     # Haar Cascade model
     install -d ${D}${APP_DIR}/models
 
-    cp -r ${WORKDIR}/models/. \
-        ${D}${APP_DIR}/models/
+    cp -r ${S}/models/. ${D}${APP_DIR}/models/
 
-    # Install systemd service
+    # Environment file
+    install -m 0600 ${WORKDIR}/.env ${D}${APP_DIR}/.env
+
+    #enable systemd
     install -d ${D}${systemd_system_unitdir}
-
-    install -m 0644 \
-        ${WORKDIR}/face-attendance.service \
-        ${D}${systemd_system_unitdir}/face-attendance.service
+    install -m 0644 ${S}/face-attendance.service ${D}${systemd_system_unitdir}/
 }
 
-FILES:${PN} += " \
-    ${APP_DIR} \
-    ${systemd_system_unitdir}/face-attendance.service \
-"
+FILES:${PN} += "${APP_DIR}"
