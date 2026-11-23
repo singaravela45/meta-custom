@@ -102,18 +102,7 @@ After configuring the two files above, go to the application's files directory:
 ```bash
 cd meta-custom/recipes-core/smart-attendance/files/
 ```
-
-Create a file named `.env` there with these values:
-
-```ini
-GMAIL_APP_PASSWORD=
-SENDER_EMAIL=
-RECEIVER_EMAIL=
-CAMERA_INDEX=1
-FACE_CONFIDENCE_THRESHOLD=70
-UNKNOWN_FRAMES_REQUIRED=5
-COOLDOWN_SECONDS=30
-```
+Modify the .env.example file with the appropriate values and rename it to .env
 
 | Variable | Required | Description |
 |---|---|---|
@@ -197,31 +186,6 @@ To change settings on the board, edit `/home/root/files/.env` and run `systemctl
 | Wrong times in attendance | The Raspberry Pi 4 has no battery-backed clock. Check the time with `date` and make sure the Pi can reach a time server. |
 | Known people not recognised | Add more varied photos per person, or adjust `FACE_CONFIDENCE_THRESHOLD`. |
 | Strangers recognised as known people | Lower `FACE_CONFIDENCE_THRESHOLD` to make matching stricter. |
-
----
-
-## Layer structure
-
-```
-meta-custom/
-├── conf/
-│   └── layer.conf
-├── recipes-core/
-│   ├── images/
-│   │   └── custom-image.bb
-│   ├── packagegroups/
-│   │   └── packagegroup-custom.bb
-│   └── smart-attendance/
-│       ├── smart-attendance-files_<version>.bb
-│       └── files/
-│           ├── main.py
-│           ├── face-attendance.service
-│           ├── known_faces/
-│           ├── models/
-│           └── .env                  (you create this; not committed)
-├── .gitignore
-└── README.md
-```
 
 ---
 
