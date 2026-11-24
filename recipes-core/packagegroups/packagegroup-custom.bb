@@ -10,9 +10,6 @@ RDEPENDS:${PN} = " \
     python3-core \
     python3-numpy \
     python3-opencv \
-    python3-datetime \
-    python3-email \
-    python3-netclient \
     ca-certificates \
     v4l-utils \
     usbutils \
