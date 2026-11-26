@@ -5,7 +5,7 @@ SRC_URI = "git://github.com/singaravela45/smart-attendance.git;protocol=https;br
 SRC_URI:append = " file://.env"
 SRCREV = "${AUTOREV}"
 
-APP_DIR = "/home/root/files"
+APP_DIR = "/usr/bin/files"
 inherit systemd
 
 SYSTEMD_SERVICE:${PN} = "face-attendance.service"
