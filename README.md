@@ -365,26 +365,26 @@ bzip2 -dc <image-file>.wic.bz2 | sudo dd of=/dev/sdX bs=4M status=progress conv=
 
 ------------------------------------------------------------------------
 
-### Default root password
+### Default login credentials
 
-The default password for the `root` user in this image is:
+The default login credentials for the image are:
 
-```text
-Password
-```
+| Username | Password |
+|---|---|
+| `root` | `Password` |
 
 > [!WARNING]
-> Change the default password before using the device in a real deployment. The default password is public and should only be used for initial login or testing.
+> Change the default password before deploying the device. The default password is intended for initial login and testing only.
 
-#### Changing the default password in the image
+### Changing the default password
 
-The root password is configured in the image recipe:
+The root password is configured in:
 
 ```text
 meta-custom/recipes-core/images/custom-image.bb
 ```
 
-Find the `EXTRA_USERS_PARAMS` setting:
+The current configuration uses the following `EXTRA_USERS_PARAMS`:
 
 ```bitbake
 EXTRA_USERS_PARAMS = " \
@@ -392,50 +392,34 @@ EXTRA_USERS_PARAMS = " \
 "
 ```
 
-To use a different password, generate a new SHA-512 password hash and replace the existing hash in this setting.
+To set a different password:
 
-**Step 1: Generate a SHA-512 password hash**
+1. Generate a SHA-512 password hash on your Linux build machine:
 
-On your Linux build machine, run:
+   ```bash
+   openssl passwd -6
+   ```
 
-```bash
-openssl passwd -6
-```
+   Enter your new password when prompted. The command prints a hash beginning with `$6$`.
 
-Enter the password when prompted. The command prints a hash beginning with `$6$`.
+2. Replace the existing hash in `EXTRA_USERS_PARAMS` in `custom-image.bb` with the newly generated hash. **Escape each `$` as `\$`** in the BitBake recipe. For example:
 
-**Step 2: Update `custom-image.bb`**
+   ```bitbake
+   EXTRA_USERS_PARAMS = " \
+       usermod -p '\$6\$your-salt\$your-generated-password-hash' root; \
+   "
+   ```
 
-Replace the existing hash in `EXTRA_USERS_PARAMS` with the newly generated hash.
+3. Save the recipe and rebuild the image:
 
-For example, if the generated hash is:
+   ```bash
+   bitbake custom-image
+   ```
 
-```text
-$6$your-salt$your-generated-password-hash
-```
-
-write it in the recipe with each `$` escaped as `\$`:
-
-```bitbake
-EXTRA_USERS_PARAMS = " \
-    usermod -p '\\$6\\$your-salt\\$your-generated-password-hash' root; \
-"
-```
-
-Keep the surrounding single quotes and the backslashes before each dollar sign. This prevents BitBake from interpreting the dollar signs as variable references.
-
-**Step 3: Rebuild the image**
-
-Save the recipe and rebuild:
-
-```bash
-bitbake custom-image
-```
-
-Flash the newly generated image to the SD card. The root account will then use the password corresponding to the hash you configured.
+   Flash the newly generated image to the SD card. The root account will use the password corresponding to the hash you configured.
 
 > [!NOTE]
-> Changing `EXTRA_USERS_PARAMS` affects newly built images. It does not change the password on a Raspberry Pi that has already been flashed. For an existing installation, log in and change the root password with `passwd`.
+> Changing `EXTRA_USERS_PARAMS` affects newly built images only. To change the password on a Raspberry Pi that has already been flashed, log in as `root` and run `passwd`.
 
 ---
 
@@ -465,36 +449,13 @@ the `smart-attendance` repository and modify `SRC_URI` in
 
 ## Troubleshooting
 
-  -------------------------------------------------------------------------
-  Problem                             What to check
-  ----------------------------------- -------------------------------------
-  No alert emails                     Check
-                                      `journalctl -u face-attendance -f`.
-                                      Make sure all three email values are
-                                      set, the Pi is online, and you are
-                                      using a Gmail **app password**.
-
-  Wrong times in attendance           The Raspberry Pi 4 has no
-                                      battery-backed clock. Check the time
-                                      with `date` and make sure the Pi can
-                                      reach a time server.
-
-  Known people not recognised         Add more varied photos per person to
-                                      the `known_faces/` directory in your
-                                      application repository, or adjust
-                                      `FACE_CONFIDENCE_THRESHOLD`.
-
-  Strangers recognised as known       Lower `FACE_CONFIDENCE_THRESHOLD` to
-  people                              make matching stricter.
-
-  Application changes are not         Check that your fork contains the
-  reflected in the image              latest changes and that `SRC_URI` in
-                                      `smart-attendance.bb` points to the
-                                      correct repository and branch.
-                                      Rebuild the image.
-  -------------------------------------------------------------------------
-
-------------------------------------------------------------------------
+| Problem | What to check |
+|---|---|
+| No alert emails | Check `journalctl -u face-attendance -f`. Make sure all three email values are set, the Pi is online, and you are using a Gmail **app password**. |
+| Wrong times in attendance | The Raspberry Pi 4 has no battery-backed clock. Check the time with `date` and make sure the Pi can reach a time server. |
+| Known people not recognised | Add more varied photos per person to the `known_faces/` directory in your application repository, or adjust `FACE_CONFIDENCE_THRESHOLD`. |
+| Strangers recognised as known people | Lower `FACE_CONFIDENCE_THRESHOLD` to make matching stricter. |
+| Application changes are not reflected in the image | Check that your fork contains the latest changes and that `SRC_URI` in `smart-attendance.bb` points to the correct repository and branch. Rebuild the image. |------------------------------------------------------------------------
 
 ## Limitations
 
